@@ -13,5 +13,5 @@
   <img align="center" alt="Rafa-Js" height="30" width="40" src="https://raw.githubusercontent.com/rafaeelricco/rafaeelricco/main/.github/workflows/javascript.svg">
   <img align="center" alt="Rafa-Ts" height="30" width="40" src="https://raw.githubusercontent.com/rafaeelricco/rafaeelricco/main/.github/workflows/Logo%20TS.svg">
   <img align="center" alt="Rafa-Sass" height="30" width="40" src="https://raw.githubusercontent.com/rafaeelricco/rafaeelricco/main/.github/workflows/Sass_Logo_Color.svg">
-  <img align="center" alt="Rafa-NuxtJs" height="35" width="auto" src="https://raw.githubusercontent.com/nuxt/nuxtjs.org/main/.github/logo.svg">
+  <img align="center" alt="Rafa-NextJS" height="35" width="auto" src="https://raw.githubusercontent.com/rafaeelricco/rafaeelricco/main/.github/workflows/nextjs.svg">
 </div>
