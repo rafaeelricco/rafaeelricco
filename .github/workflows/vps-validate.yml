@@ -1,0 +1,29 @@
+name: VPS Validate
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vps-validate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: r1cco-ci
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: Platane/snk@master
+        with:
+          github_user_name: rafaeelricco
+          svg_out_path: dist/github-contribution-grid-snake.svg
+      - name: Validate the generated SVG without publishing it
+        run: |
+          test -s dist/github-contribution-grid-snake.svg
+          python3 -c 'import xml.etree.ElementTree as ET; root = ET.parse("dist/github-contribution-grid-snake.svg").getroot(); assert root.tag == "{http://www.w3.org/2000/svg}svg"'
