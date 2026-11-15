@@ -2,13 +2,14 @@ name: Generate Datas
 
 on:
   schedule: # execute every 12 hours
-    - cron: "* */12 * * *"
+    - cron: "0 */12 * * *"
   workflow_dispatch:
 
 jobs:
   build:
+    if: github.ref == 'refs/heads/main'
     name: Jobs to update datas
-    runs-on: ubuntu-latest
+    runs-on: r1cco-ci
     steps:
       # Snake Animation
       - uses: Platane/snk@master
