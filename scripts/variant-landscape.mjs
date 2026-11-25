@@ -75,7 +75,9 @@ function style(mode) {
   const fills = Object.entries(S.classes)
     .map(([c, v]) => `.${c}{fill:${vars[v] ?? "none"}}`)
     .join("");
+  // The sun's lower dots shimmer by day; the moon made from them holds still.
   const shim = Object.entries(S.shimmer)
+    .filter(([c]) => mode !== "dark" || !SUN.includes(c))
     .map(
       ([c, [s, rev]]) =>
         `.${c}{animation:shim ${s}s ease-in-out infinite${rev ? " reverse" : ""}}`,
