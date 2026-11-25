@@ -12,6 +12,7 @@ import { manFiles, manReadme } from './variant-man.mjs';
 import { creationFiles, creationReadme } from './variant-creation.mjs';
 import { catFiles, catReadme } from './variant-cat.mjs';
 import { funFiles, funReadme } from './variant-fun.mjs';
+import { landscapeFiles, landscapeReadme } from './variant-landscape.mjs';
 
 const CACHE = root + 'profile/github-cache.json';
 const A = config.variants.activity;
@@ -87,6 +88,7 @@ const variants = {
   creation: { files: (mode) => creationFiles(data, mode), readme: creationReadme },
   cat: { files: () => catFiles(data), readme: catReadme },
   fun: { files: (mode) => funFiles(data, mode), readme: funReadme },
+  landscape: { files: (mode) => landscapeFiles(data, mode), readme: landscapeReadme },
 };
 
 rmSync(root + 'profile/generated', { recursive: true, force: true });
