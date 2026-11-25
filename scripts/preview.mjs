@@ -2,28 +2,45 @@
 // Rebuilds the panels (offline, from the cached GitHub data) whenever the
 // config or a script changes, then reloads the page.
 //   node scripts/preview.mjs [port]
-import { createServer } from 'node:http';
-import { readFileSync, existsSync, watch } from 'node:fs';
-import { spawn } from 'node:child_process';
-import { extname, join, normalize } from 'node:path';
+import { createServer } from "node:http";
+import { readFileSync, existsSync, watch } from "node:fs";
+import { spawn } from "node:child_process";
+import { extname, join, normalize } from "node:path";
 
-const root = new URL('..', import.meta.url).pathname;
+const root = new URL("..", import.meta.url).pathname;
 const port = Number(process.argv[2] || process.env.PORT || 4321);
 const clients = new Set();
-let building = null, queued = false, lastError = '';
+let building = null,
+  queued = false,
+  lastError = "";
 
 function build() {
-  if (building) { queued = true; return; }
+  if (building) {
+    queued = true;
+    return;
+  }
   const started = Date.now();
-  building = spawn(process.execPath, [join(root, 'scripts/build-profile.mjs')], { cwd: root, env: { ...process.env, PROFILE_OFFLINE: '1' } });
-  let err = '';
-  building.stderr.on('data', (d) => (err += d));
-  building.on('close', (code) => {
+  building = spawn(
+    process.execPath,
+    [join(root, "scripts/build-profile.mjs")],
+    { cwd: root, env: { ...process.env, PROFILE_OFFLINE: "1" } },
+  );
+  let err = "";
+  building.stderr.on("data", (d) => (err += d));
+  building.on("close", (code) => {
     building = null;
-    lastError = code === 0 ? '' : err.trim();
-    console.log(code === 0 ? `rebuilt in ${Date.now() - started}ms` : `build failed:\n${lastError}`);
-    for (const res of clients) res.write(`data: ${code === 0 ? 'reload' : 'error'}\n\n`);
-    if (queued) { queued = false; build(); }
+    lastError = code === 0 ? "" : err.trim();
+    console.log(
+      code === 0
+        ? `rebuilt in ${Date.now() - started}ms`
+        : `build failed:\n${lastError}`,
+    );
+    for (const res of clients)
+      res.write(`data: ${code === 0 ? "reload" : "error"}\n\n`);
+    if (queued) {
+      queued = false;
+      build();
+    }
   });
 }
 
@@ -33,11 +50,14 @@ const onChange = (_, file) => {
   clearTimeout(timer);
   timer = setTimeout(build, 120);
 };
-watch(join(root, 'scripts'), onChange);
-watch(join(root, 'profile.config.json'), onChange);
+watch(join(root, "scripts"), onChange);
+watch(join(root, "profile.config.json"), onChange);
 
 const page = () => {
-  const readme = readFileSync(join(root, 'README.md'), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+  const readme = readFileSync(join(root, "README.md"), "utf8").replace(
+    /<!--[\s\S]*?-->/g,
+    "",
+  );
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>rafaeelricco README preview</title>
 <style>
@@ -58,7 +78,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
 .err{white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,monospace;color:#cf222e;border:1px solid #cf222e;border-radius:6px;padding:12px;margin-bottom:16px}
 </style></head><body>
 <div class="bar" role="group" aria-label="GitHub theme"><button id="m-auto" data-m="" aria-pressed="true">System</button><button id="m-dark" data-m="dark" aria-pressed="false">Dark</button><button id="m-light" data-m="light" aria-pressed="false">Light</button></div>
-<div class="wrap">${lastError ? `<div class="err">Build failed, showing the last good panels:\n${lastError.replace(/</g, '&lt;')}</div>` : ''}<article class="readme" id="readme">${readme}</article></div>
+<div class="wrap">${lastError ? `<div class="err">Build failed, showing the last good panels:\n${lastError.replace(/</g, "&lt;")}</div>` : ""}<article class="readme" id="readme">${readme}</article></div>
 <script>
 // Force a theme by pointing each <picture> at its dark or light file, as GitHub would.
 let mode = '';
@@ -81,20 +101,43 @@ new EventSource('/events').onmessage = () => location.reload();
 </script></body></html>`;
 };
 
-const TYPES = { '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json', '.woff2': 'font/woff2' };
+const TYPES = {
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".json": "application/json",
+  ".woff2": "font/woff2",
+};
 createServer((req, res) => {
-  const url = new URL(req.url, 'http://x');
-  if (url.pathname === '/') { res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }); return res.end(page()); }
-  if (url.pathname === '/events') {
-    res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-store', connection: 'keep-alive' });
-    res.write(': ok\n\n');
+  const url = new URL(req.url, "http://x");
+  if (url.pathname === "/") {
+    res.writeHead(200, {
+      "content-type": "text/html; charset=utf-8",
+      "cache-control": "no-store",
+    });
+    return res.end(page());
+  }
+  if (url.pathname === "/events") {
+    res.writeHead(200, {
+      "content-type": "text/event-stream",
+      "cache-control": "no-store",
+      connection: "keep-alive",
+    });
+    res.write(": ok\n\n");
     clients.add(res);
-    return req.on('close', () => clients.delete(res));
+    return req.on("close", () => clients.delete(res));
   }
   const file = normalize(join(root, decodeURIComponent(url.pathname)));
-  if (!file.startsWith(join(root, 'profile/')) || !existsSync(file)) { res.writeHead(404); return res.end('not found'); }
-  res.writeHead(200, { 'content-type': TYPES[extname(file)] || 'application/octet-stream', 'cache-control': 'no-store' });
+  if (!file.startsWith(join(root, "profile/")) || !existsSync(file)) {
+    res.writeHead(404);
+    return res.end("not found");
+  }
+  res.writeHead(200, {
+    "content-type": TYPES[extname(file)] || "application/octet-stream",
+    "cache-control": "no-store",
+  });
   res.end(readFileSync(file));
-}).listen(port, () => console.log(`README preview on http://localhost:${port}`));
+}).listen(port, () =>
+  console.log(`README preview on http://localhost:${port}`),
+);
 
 build();

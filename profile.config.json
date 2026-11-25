@@ -19,14 +19,8 @@
       {
         "repo": "postie",
         "cta": "View source",
-        "flow": [
-          "Postgres",
-          "Kafka",
-          "HTTP"
-        ],
-        "lines": [
-          "$ go run ./cmd/postie config validate"
-        ],
+        "flow": ["Postgres", "Kafka", "HTTP"],
+        "lines": ["$ go run ./cmd/postie config validate"],
         "kind": "Service"
       },
       {
@@ -57,11 +51,7 @@
         ]
       }
     ],
-    "more": [
-      "claude-code.nvim",
-      "copy.nvim",
-      "preview.nvim"
-    ],
+    "more": ["claude-code.nvim", "copy.nvim", "preview.nvim"],
     "button": "none"
   },
   "profile": {
@@ -71,22 +61,10 @@
     "intro": "Product engineer building full-stack and AI applications.",
     "now": "shipping job-kit-ai and postie",
     "cells": [
-      [
-        "Based in",
-        "RS, Brasil"
-      ],
-      [
-        "Focus",
-        "AI products"
-      ],
-      [
-        "Stack",
-        "TS · Python"
-      ],
-      [
-        "Contributions",
-        "{contributions}"
-      ]
+      ["Based in", "RS, Brasil"],
+      ["Focus", "AI products"],
+      ["Stack", "TS · Python"],
+      ["Contributions", "{contributions}"]
     ],
     "links": [
       {
@@ -185,11 +163,7 @@
           "repo": "postie"
         }
       ],
-      "more": [
-        "claude-code.nvim",
-        "copy.nvim",
-        "r1cco"
-      ],
+      "more": ["claude-code.nvim", "copy.nvim", "r1cco"],
       "links": [
         {
           "label": "r1cco.com",
