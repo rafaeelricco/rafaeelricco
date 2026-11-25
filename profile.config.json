@@ -1,0 +1,235 @@
+{
+  "github": {
+    "username": "rafaeelricco",
+    "featured": [
+      {
+        "repo": "job-kit-ai",
+        "cta": "Visit project",
+        "url": "https://r1cco.com/jobs/",
+        "lines": [
+          "$ curl -fsSL r1cco.com/install.sh | bash",
+          "",
+          "> /job-scout",
+          "> /job-match",
+          "> /job-resume-refine",
+          "> /job-inbox"
+        ],
+        "kind": "Agent skills"
+      },
+      {
+        "repo": "postie",
+        "cta": "View source",
+        "flow": [
+          "Postgres",
+          "Kafka",
+          "HTTP"
+        ],
+        "lines": [
+          "$ go run ./cmd/postie config validate"
+        ],
+        "kind": "Service"
+      },
+      {
+        "repo": "commit-tools",
+        "cta": "Install",
+        "url": "https://www.npmjs.com/package/@rafaeelricco/commit-tools",
+        "lines": [
+          "$ npm i -g @rafaeelricco/commit-tools",
+          "",
+          "Separate auth credentials from config",
+          "",
+          "- Introduce AuthCredentials type",
+          "- Stop passing raw API keys"
+        ],
+        "kind": "CLI"
+      },
+      {
+        "repo": "dotfiles",
+        "cta": "View source",
+        "kind": "Agent skills + config",
+        "lines": [
+          "$ curl -fsSL r1cco.com/skills/verify | bash",
+          "",
+          "> linked into Claude Code",
+          "> linked into Codex and Grok",
+          "> linked into Cursor and Hermes",
+          "  nvim, ghostty and zsh config included"
+        ]
+      }
+    ],
+    "more": [
+      "claude-code.nvim",
+      "copy.nvim",
+      "preview.nvim"
+    ]
+  },
+  "profile": {
+    "name": "Rafael Ricco",
+    "short": "rafael",
+    "handle": "@rafaeelricco",
+    "intro": "Product engineer building full-stack and AI applications.",
+    "now": "shipping job-kit-ai and postie",
+    "cells": [
+      [
+        "Based in",
+        "RS, Brasil"
+      ],
+      [
+        "Focus",
+        "AI products"
+      ],
+      [
+        "Stack",
+        "TS · Python"
+      ],
+      [
+        "Contributions",
+        "{contributions}"
+      ]
+    ],
+    "links": [
+      {
+        "label": "r1cco.com",
+        "icon": "globe",
+        "url": "https://www.r1cco.com"
+      },
+      {
+        "label": "linkedin",
+        "icon": "in",
+        "url": "https://www.linkedin.com/in/rafael-r1cco"
+      },
+      {
+        "label": "repositories",
+        "icon": "grid",
+        "url": "https://github.com/rafaeelricco?tab=repositories"
+      }
+    ]
+  },
+  "theme": {
+    "dark": {
+      "page": "#0d0d0d",
+      "panel": "#141414",
+      "well": "#1a1a1a",
+      "text1": "#ffffff",
+      "text2": "#a3a3a3",
+      "text3": "#8f8f8f",
+      "line": "#252525",
+      "lineFaint": "#1c1c1c",
+      "accent": "#0095fa",
+      "onAccent": "#ffffff",
+      "button": "#262626",
+      "buttonText": "#ededed",
+      "scene": [
+        "#0d0d0d",
+        "#141414",
+        "#1f1f1f",
+        "#262626",
+        "#3a3a3a",
+        "#8f8f8f",
+        "#ededed"
+      ]
+    },
+    "light": {
+      "page": "#ffffff",
+      "panel": "#fafafa",
+      "well": "#f8f8f8",
+      "text1": "#121212",
+      "text2": "#616161",
+      "text3": "#7e7e7e",
+      "line": "#e7e7e7",
+      "lineFaint": "#f2f2f2",
+      "accent": "#0095fa",
+      "onAccent": "#ffffff",
+      "button": "#e5e5e5",
+      "buttonText": "#262626",
+      "scene": [
+        "#ffffff",
+        "#fafafa",
+        "#f2f2f2",
+        "#e5e5e5",
+        "#d4d4d4",
+        "#8f8f8f",
+        "#616161"
+      ]
+    }
+  },
+  "motion": {
+    "frames": 48,
+    "fps": 12
+  },
+  "layout": {
+    "width": 880,
+    "cell": 4
+  },
+  "variant": "sunset",
+  "variants": {
+    "activity": {
+      "name": "Rafael Ricco",
+      "handle": "@rafaeelricco",
+      "line1": "Product engineer building full-stack and AI applications.",
+      "line2": "From customer problems to production.",
+      "featured": [
+        {
+          "repo": "job-kit-ai",
+          "url": "https://r1cco.com/jobs/"
+        },
+        {
+          "repo": "dotfiles"
+        },
+        {
+          "repo": "commit-tools",
+          "url": "https://www.npmjs.com/package/@rafaeelricco/commit-tools"
+        },
+        {
+          "repo": "postie"
+        }
+      ],
+      "more": [
+        "claude-code.nvim",
+        "copy.nvim",
+        "r1cco"
+      ],
+      "links": [
+        {
+          "label": "r1cco.com",
+          "url": "https://www.r1cco.com"
+        },
+        {
+          "label": "linkedin",
+          "url": "https://www.linkedin.com/in/rafael-r1cco"
+        }
+      ]
+    },
+    "terminal": {
+      "telescope": [
+        "job-kit-ai",
+        "postie",
+        "commit-tools",
+        "dotfiles",
+        "preview.nvim",
+        "copy.nvim",
+        "claude-code.nvim"
+      ],
+      "links": [
+        {
+          "label": "r1cco.com",
+          "cmd": "e r1cco.com",
+          "url": "https://www.r1cco.com"
+        },
+        {
+          "label": "linkedin",
+          "cmd": "e linkedin",
+          "url": "https://www.linkedin.com/in/rafael-r1cco"
+        },
+        {
+          "label": "repositories",
+          "cmd": "Telescope repos",
+          "url": "https://github.com/rafaeelricco?tab=repositories"
+        }
+      ]
+    }
+  },
+  "descriptionFallbacks": {
+    "preview.nvim": "Neovim plugin that renders Markdown in place: headings, lists, tables and code blocks, while the source stays editable. Needs Neovim 0.12."
+  }
+}
