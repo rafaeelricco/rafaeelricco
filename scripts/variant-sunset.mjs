@@ -90,9 +90,17 @@ function busy(x, y) {
 // Spacing: every panel is a card inset G from the image edge; content sits P inside the card.
 const G = 4, P = 20, X0 = G + P, BAR = 40;
 
-function head(w, name, right = '', status = '') {
-  const sx = X0 + name.length * 7.8 + 16;
-  return `<rect width="${w}" height="${BAR}" fill="${C.panel}"/>${hline(BAR - 1, 0, w)}<text x="${X0}" y="${G + 23}" class="code t1" font-weight="500">${esc(name)}</text>${status ? `${busy(sx, G + 13)}<text x="${sx + 16}" y="${G + 23}" class="label t2">${esc(status)}</text>` : ''}<text x="${w - X0}" y="${G + 23}" text-anchor="end" class="code-sm t3">${esc(right)}</text>`;
+function head(w, name, right = '', status = '', action = '') {
+  const sx = name ? X0 + name.length * 7.8 + 16 : X0;
+  let rx = w - X0, btn = '';
+  if (action) {
+    // small "Open" pill at the right end of the bar, in the site's intro-link colors
+    const tw = textWidth(action, 13) + action.length * 0.13, ih = 8, bw = Math.round(10 + tw + 6 + ih + 10), bh = 24;
+    const bx = w - X0 - bw, by = G + 18 - bh / 2, ix = bx + 10 + tw + 6, iy = G + 18 - ih / 2;
+    btn = `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="${bh / 2}" fill="${C.button}"/><text x="${bx + 10}" y="${G + 22.5}" class="sans" font-size="13" font-weight="500" fill="${C.buttonText}">${esc(action)}</text><path d="M${ix} ${iy + ih}L${ix + ih} ${iy}M${ix + 2.2} ${iy}H${ix + ih}V${iy + ih - 2.2}" fill="none" stroke="${C.accent}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    rx = bx - 12;
+  }
+  return `<rect width="${w}" height="${BAR}" fill="${C.panel}"/>${hline(BAR - 1, 0, w)}<text x="${X0}" y="${G + 23}" class="code t1" font-weight="500">${esc(name)}</text>${status ? `${busy(sx, G + 13)}<text x="${sx + 16}" y="${G + 23}" class="label t2">${esc(status)}</text>` : ''}<text x="${rx}" y="${G + 23}" text-anchor="end" class="code-sm t3">${esc(right)}</text>${btn}`;
 }
 const img = (x, y, w, h, data, cls = '', extra = '') => `<image x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="none" ${cls ? `class="${cls}"` : ''} ${extra} href="data:image/png;base64,${data}"/>`;
 
@@ -104,31 +112,40 @@ function pill(xRight, yMid, label) {
   return `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="${bh / 2}" fill="${C.button}"/><text x="${bx + 12}" y="${yMid + 5}" class="sans" font-size="14" font-weight="500" fill="${C.buttonText}">${esc(label)}</text><path d="M${ix} ${iy + iw}L${ix + iw} ${iy}M${ix + 2.5} ${iy}H${ix + iw}V${iy + iw - 2.5}" fill="none" stroke="${C.accent}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`;
 }
 
+// Card footer styles. `github.button` in the config picks one.
+function footer(style, w, f0, repo, f) {
+  const mid = f0 + 28, label = f.cta, path = `<text x="${X0}" y="${mid + 4}" class="code-sm t3">${esc(repo.full_name)}</text>`;
+  const arrow = (x, y, s = 9, color = C.accent, sw = 1.6) => `<path d="M${x} ${y + s}L${x + s} ${y}M${x + s * 0.28} ${y}H${x + s}V${y + s * 0.72}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const tw = textWidth(label, 14) + label.length * 0.14;
+  if (style === 'link') {
+    const x = w - X0 - tw - 15;
+    return `${path}<text x="${x}" y="${mid + 5}" class="sans" font-size="14" font-weight="500" fill="${C.accent}">${esc(label)}</text>${arrow(x + tw + 6, mid - 4.5, 9, C.accent)}`;
+  }
+  if (style === 'ink') {
+    const bw = Math.round(14 + tw + 7 + 9 + 14), bx = w - X0 - bw;
+    return `${path}<rect x="${bx}" y="${mid - 15}" width="${bw}" height="30" rx="15" fill="${C.text1}"/><text x="${bx + 14}" y="${mid + 5}" class="sans" font-size="14" font-weight="500" fill="${C.page}">${esc(label)}</text>${arrow(bx + 14 + tw + 7, mid - 4.5, 9, C.page)}`;
+  }
+  if (style === 'outline') {
+    const bw = Math.round(14 + tw + 7 + 9 + 14), bx = w - X0 - bw;
+    return `${path}<rect x="${bx + 0.5}" y="${mid - 14.5}" width="${bw - 1}" height="29" rx="14.5" fill="none" stroke="${C.line}"/><text x="${bx + 14}" y="${mid + 5}" class="sans" font-size="14" font-weight="500" fill="${C.text1}">${esc(label)}</text>${arrow(bx + 14 + tw + 7, mid - 4.5, 9, C.text3)}`;
+  }
+  if (style === 'row') {
+    // the whole footer reads as one link row: label left, arrow right
+    return `<text x="${X0}" y="${mid + 5}" class="sans" font-size="14" font-weight="500" fill="${C.text1}">${esc(label)}</text><text x="${X0 + tw + 10}" y="${mid + 4}" class="code-sm t3">${esc(repo.full_name.split('/')[1])}</text>${arrow(w - X0 - 10, mid - 5, 10, C.text1)}`;
+  }
+  return `${path}${pill(w - X0, mid, label)}`;
+}
+
 // ---------- panels ----------
-function headerSvg(data) {
-  const sceneY = BAR, sceneH = 240, heroH = 184, H = sceneY + sceneH + heroH + G, split = 520;
+function headerSvg() {
+  const sceneY = BAR, sceneH = 240, H = sceneY + sceneH + G;
   const cell = layout.cell, cols = W / cell, rws = sceneH / cell;
   const n = motion.frames;
   const frames = Array.from({ length: n }, (_, i) => pampaFrame(i / n, cols, rws, C.scene.length));
   const anim = png(frames, cols, rws, C.scene, motion.fps);
   const still = png([frames[0]], cols, rws, C.scene, motion.fps);
-  const top = sceneY + sceneH;
-  const cw = (W - G - split) / 2, ch = heroH / 2;
-  const contributions = data.contributions.reduce((a, d) => a + d.count, 0).toLocaleString('en-US');
-  const cells = profile.cells.map(([label, raw], i) => {
-    const value = raw.replace('{contributions}', contributions);
-    const x = split + (i % 2) * cw, y = top + Math.floor(i / 2) * ch;
-    // label cap (8) + 22 gap + value cap (16) = 46, centered in the cell
-    return `${i % 2 === 0 ? vline(x + cw, y, y + ch) : ''}${i < 2 ? hline(y + ch, x, x + cw + G) : ''}<text x="${x + P}" y="${y + 34}" class="micro t3">${esc(label)}</text><text x="${x + P}" y="${y + 64}" class="sans t1" font-size="16" font-weight="500" letter-spacing="-.01em">${esc(clamp(value, 16))}</text>`;
-  }).join('');
-  const body = `${head(W, profile.short, `github.com/${github.username}`, 'building')}
-<g transform="translate(0 ${sceneY})">${img(0, 0, W, sceneH, anim, 'motion')}${img(0, 0, W, sceneH, still, 'still', 'style="display:none"')}</g>
-${hline(top)}${vline(split, top, H)}
-<text x="${X0 + 2}" y="${top + 60}" class="sans display t1">${esc(profile.name)}</text>
-<text x="${X0 + 3}" y="${top + 88}" class="sans t2" font-size="14">${esc(profile.intro)}</text>
-<text x="${X0 + 3}" y="${top + 128}" class="micro t3">Now</text><text x="${X0 + 80}" y="${top + 128}" class="code-sm t2">${esc(profile.now)}</text>
-<text x="${X0 + 3}" y="${top + 152}" class="micro t3">Handle</text><text x="${X0 + 80}" y="${top + 152}" class="code-sm t2">${esc(profile.handle)}</text>
-${cells}`;
+  const body = `${head(W, '', `github.com/${github.username}`, 'building')}
+<g transform="translate(0 ${sceneY})">${img(0, 0, W, sceneH, anim, 'motion')}${img(0, 0, W, sceneH, still, 'still', 'style="display:none"')}</g>`;
   return shell(W, H, `${profile.name}: ${profile.intro}`, body);
 }
 
@@ -166,7 +183,8 @@ function screen(f, x, y, w, h, seed = 0) {
 }
 
 function projectSvg(f, repo, index, act) {
-  const w = W / 2, bannerH = 196, bodyH = 164, metaH = 64, footH = 56 + G;
+  const style = github.button || 'pill';
+  const w = W / 2, bannerH = 196, bodyH = 164, metaH = 64, footH = style === 'none' ? G : 56 + G;
   const H = BAR + bannerH + bodyH + metaH + footH;
   const cell = layout.cell, cols = w / cell, rws = bannerH / cell;
   const field = png([fieldFrame(index * 3.7 + 1, cols, rws, C.scene.length)], cols, rws, C.scene, 1);
@@ -176,13 +194,12 @@ function projectSvg(f, repo, index, act) {
   const third = (w - G) / 3;
   const meta = [['Language', repo.language || 'mixed'], commits != null ? ['Commits, 1y', commits.toLocaleString('en-US')] : ['Stars', compact(repo.stargazers_count)], ['Updated', date(repo.pushed_at)]]
     .map(([l, v], i) => `${i < 2 ? vline(G + third * (i + 1), m, m + metaH) : ''}<text x="${G + third * i + P}" y="${m + 26}" class="micro t3">${l}</text><text x="${G + third * i + P}" y="${m + 47}" class="sans body t1" font-weight="500">${esc(v)}</text>`).join('');
-  const body = `${head(w, String(index + 1).padStart(2, '0') + '  ' + repo.name, (f.kind || '').toLowerCase())}
+  const body = `${head(w, String(index + 1).padStart(2, '0') + '  ' + repo.name, (f.kind || '').toLowerCase(), '', style === 'none' ? 'Open' : '')}
 <g transform="translate(0 ${BAR})">${img(0, 0, w, bannerH, field)}${screen(f, X0, P, w - X0 * 2, bannerH - P * 2, index)}</g>${hline(b)}
 <text x="${X0}" y="${b + 44}" class="sans title t1">${esc(repo.name)}</text>
 ${desc.map((l, k) => `<text x="${X0}" y="${b + 74 + k * 22}" class="sans body t2">${esc(l)}</text>`).join('')}
-${hline(m)}${meta}${hline(f0)}
-<text x="${X0}" y="${f0 + 32}" class="code-sm t3">${esc(repo.full_name)}</text>
-${pill(w - X0, f0 + 28, f.cta)}`;
+${hline(m)}${meta}${style === 'none' ? '' : hline(f0)}
+${style === 'none' ? '' : footer(style, w, f0, repo, f)}`;
   return shell(w, H, `${repo.full_name}: ${repo.description || ''}`, body);
 }
 

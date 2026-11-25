@@ -61,7 +61,8 @@
       "claude-code.nvim",
       "copy.nvim",
       "preview.nvim"
-    ]
+    ],
+    "button": "none"
   },
   "profile": {
     "name": "Rafael Ricco",

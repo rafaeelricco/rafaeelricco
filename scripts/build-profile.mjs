@@ -56,6 +56,7 @@ async function commitsPerDay(repo) {
 }
 
 async function loadData() {
+  if (process.env.PROFILE_OFFLINE) return JSON.parse(readFileSync(CACHE, 'utf8')); // local preview: no network
   try {
     const user = await gh(`/users/${github.username}`);
     const names = [...new Set([...github.featured.map((f) => f.repo), ...github.more, ...A.featured.map((f) => f.repo), ...A.more, ...config.variants.terminal.telescope])];
