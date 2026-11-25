@@ -11,9 +11,33 @@ const H = S.height;
 const CW = S.fontSize * 0.6; // JetBrains Mono advance
 const X0 = (W - S.cols * CW) / 2;
 const BASE = S.fontSize * 0.78; // baseline inside a row
-const ALT = 'An ASCII landscape: a halftone sun over snowy mountains, pine forests and a lake, with clouds drifting and birds crossing.';
+const ALT = 'An ASCII landscape: a halftone sun (a crescent moon at night) over snowy mountains, pine forests and a lake, with clouds drifting and birds crossing.';
 
-const FRAME = { light: { sky: '#fbfaf6', line: '#e7e7e7', bird: '#3a3a3a' }, dark: { sky: '#0b0f17', line: '#252525', bird: '#d6d6d6' } };
+const FRAME = { light: { bird: '#3a3a3a' }, dark: { bird: '#d6d6d6' } };
+
+// At night the sun becomes a pale crescent moon: same disc, recoloured, with a bite taken
+// out of its upper right by a second, offset circle.
+const SUN = ['u1', 'u2', 'u3'];
+const MOON = { u1: '#eef1f8', u2: '#cdd5e6', u3: '#8f9bb8' };
+function moonArt(art) {
+  const cells = [];
+  art.forEach((r, y) => { let x = 0; for (const [c, t] of r) for (const ch of t) { if (SUN.includes(c) && ch !== ' ') cells.push([x, y]); x++; } });
+  const xs = cells.map(([x]) => x * CW), ys = cells.map(([, y]) => y * S.rowH);
+  const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+  const R = (Math.max(...xs) - Math.min(...xs)) / 2;
+  const bx = cx + R * 0.62, by = cy - R * 0.22, br = R * 0.84;
+  return art.map((r, y) => {
+    const out = [];
+    let x = 0;
+    for (const [c, t] of r) for (const ch of t) {
+      const bitten = SUN.includes(c) && Math.hypot(x * CW - bx, y * S.rowH - by) < br;
+      const cls = bitten ? null : c, glyph = bitten ? ' ' : ch;
+      if (out.length && out[out.length - 1][0] === cls) out[out.length - 1][1] += glyph; else out.push([cls, glyph]);
+      x++;
+    }
+    return out;
+  });
+}
 
 function textRow(runs, x, y) {
   const body = runs.map(([c, t]) => (c ? `<tspan class="${c}">${esc(t)}</tspan>` : esc(t))).join('');
@@ -21,7 +45,7 @@ function textRow(runs, x, y) {
 }
 
 function style(mode) {
-  const vars = { ...S.colors[mode], ...FRAME[mode] };
+  const vars = { ...S.colors[mode], ...FRAME[mode], ...(mode === 'dark' ? MOON : {}) };
   // A class with no color in this theme (the stars in light) is not drawn.
   const fills = Object.entries(S.classes).map(([c, v]) => `.${c}{fill:${vars[v] ?? 'none'}}`).join('');
   const shim = Object.entries(S.shimmer).map(([c, [s, rev]]) => `.${c}{animation:shim ${s}s ease-in-out infinite${rev ? ' reverse' : ''}}`).join('');
@@ -49,21 +73,18 @@ function bird([top, small, slow, delay], i) {
 }
 
 export function landscapeFiles(_data, mode) {
-  const f = FRAME[mode];
   const top = H - S.art.length * S.rowH;
-  const art = S.art.map((r, i) => textRow(r, X0, top + i * S.rowH + BASE)).join('\n');
+  const art = (mode === 'dark' ? moonArt(S.art) : S.art).map((r, i) => textRow(r, X0, top + i * S.rowH + BASE)).join('\n');
   const clouds = S.clouds.map((c) => `<g transform="translate(${c.x} ${c.y})"><g class="drift ${c.k}">${c.rows.map((r, i) => textRow(r, 0, i * S.rowH + BASE)).join('')}</g></g>`).join('\n');
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(ALT)}">
 <title>${esc(ALT)}</title>
 <style>${style(mode)}</style>
-<defs><clipPath id="card"><rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="14"/></clipPath></defs>
-<rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="14" fill="${f.sky}"/>
+<defs><clipPath id="card"><rect width="${W}" height="${H}"/></clipPath></defs>
 <g clip-path="url(#card)">
 ${clouds}
 <g class="bird">${BIRDS.map(bird).join('')}</g>
 ${art}
 </g>
-<rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="14" fill="none" stroke="${f.line}"/>
 </svg>`;
   return { scene: svg };
 }
